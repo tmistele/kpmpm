@@ -22,13 +22,8 @@
 #include <kmarkdownview-config.h>
 
 // Qt headers
-#ifdef USE_QTWEBKIT
-#include <QWebView>
-#include <QWebPage>
-#else
 #include <QWebEngineView>
 #include <QWebEnginePage>
-#endif
 #include <QAction>
 
 #include <QFile>
@@ -39,20 +34,12 @@ class KMarkdownHtmlView;
 class QUrl;
 
 class KMARKDOWNVIEW_EXPORT KMarkdownView : public
-#ifdef USE_QTWEBKIT
-    QWebView
-#else
     QWebEngineView
-#endif
 {
     Q_OBJECT
 
 public:
-#ifdef USE_QTWEBKIT
-    typedef QWebPage WebPage;
-#else
     typedef QWebEnginePage WebPage;
-#endif
 
 public:
     explicit KMarkdownView(KAbstractMarkdownSourceDocument* sourceDocument, QWidget* parent = nullptr);
@@ -86,10 +73,6 @@ protected:
     void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
-#ifdef USE_QTWEBKIT
-    void openUrlExternally(const QUrl& url);
-#endif
-
     void doLoadFinished(bool ok);
     void initDone();
     void textChanged(const QString& text);
