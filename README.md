@@ -10,18 +10,8 @@ _This is a combination of the [Kate preview addon](https://invent.kde.org/utilit
 
 ### Install to home directory
 
-Build and install kate addon, e.g.
+Build and install, e.g.
 ```
-$ cd kateaddon/
-$ mkdir build && cd build
-$ cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.local
-$ make -j5
-$ make install
-```
-
-Build and install viewer (i.e. the markdown kpart), e.g.
-```
-$ cd viewer/
 $ mkdir build && cd build
 $ cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.local
 $ make -j5
