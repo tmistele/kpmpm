@@ -21,6 +21,8 @@
 
 #include <ktexteditorpreview_debug.h>
 
+#include <markdownpart.h>
+
 // KF
 #include <KTextEditor/Document>
 
@@ -46,17 +48,13 @@ using namespace KTextEditorPreview;
 static const int updateDelayFast = 150; // ms
 static const int updateDelaySlow = 1000; // ms
 
-KPartView::KPartView(const KService::Ptr &service, QObject *parent)
+KPartView::KPartView(MarkdownPart* part, QObject *parent)
     : QObject(parent)
 {
-    QString errorString;
-    m_part = service->createInstance<KParts::ReadOnlyPart>(nullptr, this, QVariantList(), &errorString);
-
+    m_part = part;
     if (!m_part) {
-        m_errorLabel = new QLabel(errorString);
+        m_errorLabel = new QLabel(QStringLiteral("No KPart"));
     } else if (!m_part->widget()) {
-        // should not happen, but just be safe
-        delete m_part;
         m_errorLabel = new QLabel(QStringLiteral("KPart provides no widget."));
     } else {
         m_updateSquashingTimerFast.setSingleShot(true);
@@ -196,50 +194,7 @@ void KPartView::updatePreview()
     // TODO: investigate if pushing of the data to the kpart could be done in a non-gui-thread,
     // so their loading of the file (e.g. ReadOnlyPart::openFile() is sync design) does not block
 
-    auto mimeType = m_document->mimeType();
-    if(m_revealjs)
-        mimeType = QLatin1Literal("text/markdown+revealjs");
-
-    KParts::OpenUrlArguments arguments;
-    arguments.setMimeType(mimeType);
-    m_part->setArguments(arguments);
-
-    // try to stream the data to avoid filesystem I/O
-    // create url unique for this document
-    // TODO: encode existing url instead, and for yet-to-be-stored docs some other unique id
-    
-    // Use document's url to make relative links works in kmarkdownview (pmpm version)
-    // TODO: Add GET parameter to make unique?
-    // TODO: yet-to-be-stored docs don't have preview anyway??
-    const QUrl streamUrl = m_document->url();
-    if (m_part->openStream(mimeType, streamUrl)) {
-        qCDebug(KTEPREVIEW) << "Pushing data via streaming API, url:" << streamUrl.url();
-        m_part->writeStream(m_document->text().toUtf8());
-        m_part->closeStream();
-
-        m_previewDirty = false;
-        return;
-    }
-
-    // have to go via filesystem for now, not nice
-    if (!m_bufferFile) {
-        m_bufferFile = new QTemporaryFile(this);
-        m_bufferFile->open();
-    } else {
-        // reset position
-        m_bufferFile->seek(0);
-    }
-    const QUrl tempFileUrl(QUrl::fromLocalFile(m_bufferFile->fileName()));
-    qCDebug(KTEPREVIEW) << "Pushing data via temporary file, url:" << tempFileUrl.url();
-
-    // write current data
-    m_bufferFile->write(m_document->text().toUtf8());
-    // truncate at end of new content
-    m_bufferFile->resize(m_bufferFile->pos());
-    m_bufferFile->flush();
-
-    // TODO: find out why we need to send this queued
-    QMetaObject::invokeMethod(m_part, "openUrl", Qt::QueuedConnection, Q_ARG(QUrl, tempFileUrl));
+    m_part->pmpmDirectOpen(m_document->text(), m_document->url(), m_revealjs);
 
     m_previewDirty = false;
 }

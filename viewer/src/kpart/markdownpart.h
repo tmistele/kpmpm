@@ -18,6 +18,8 @@
 #ifndef MARKDOWNPART_H
 #define MARKDOWNPART_H
 
+#include <kmarkdownviewpart_export.h>
+
 // KF
 #include <KParts/ReadOnlyPart>
 
@@ -31,7 +33,7 @@ class KMarkdownView;
 class SearchToolBar;
 class KAboutData;
 
-class MarkdownPart : public KParts::ReadOnlyPart
+class KMARKDOWNVIEWPART_EXPORT MarkdownPart : public KParts::ReadOnlyPart
 {
     Q_OBJECT
 
@@ -61,6 +63,10 @@ public:
 
     void copySelection();
 
+    bool closeUrl() override;
+
+    void pmpmDirectOpen(const QString& text, const QUrl& url, bool revealjs);
+
 protected: // KParts::ReadOnlyPart API
     bool openFile() override;
 
@@ -68,7 +74,6 @@ protected: // KParts::ReadOnlyPart API
     bool doWriteStream(const QByteArray& data) override;
     bool doCloseStream() override;
 
-    bool closeUrl() override;
 
 private:
     void setupActions(Modus modus);

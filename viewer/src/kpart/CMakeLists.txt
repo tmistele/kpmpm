@@ -15,9 +15,12 @@ qt5_add_resources(markdownpart_SRCS
     markdownpart.qrc
 )
 
-add_library(kmarkdownwebviewpart  MODULE ${markdownpart_SRCS})
+# SHARED instead of MODULE so that kateaddon/ can link to it directly
+# TODO: Better way to achieve this?
+add_library(kmarkdownwebviewpart  SHARED ${markdownpart_SRCS})
 kcoreaddons_desktop_to_json(kmarkdownwebviewpart kmarkdownwebviewpart.desktop)
-
+# For kateaddon
+generate_export_header(kmarkdownwebviewpart BASE_NAME kmarkdownviewpart)
 
 target_link_libraries(kmarkdownwebviewpart
     KMarkdownWebView
@@ -26,6 +29,11 @@ target_link_libraries(kmarkdownwebviewpart
 )
 
 install(TARGETS kmarkdownwebviewpart  DESTINATION ${KDE_INSTALL_PLUGINDIR}/kf5/parts)
+
+# Install a second time, so that kateaddon can link to it directly
+# TODO: Better way to achieve this? Make one of the two a symlink?
+install(TARGETS kmarkdownwebviewpart ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
+
 install(FILES kmarkdownwebviewpart.desktop  DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
 
 install(

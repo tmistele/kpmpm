@@ -20,6 +20,8 @@
 #ifndef KTEXTEDITORPREVIEW_PREVIEWWIDGET_H
 #define KTEXTEDITORPREVIEW_PREVIEWWIDGET_H
 
+#include <markdownpart.h>
+
 // KF
 #include <KXMLGUIBuilder>
 #include <KService>
@@ -101,7 +103,6 @@ private Q_SLOTS:
     void unsetDocument(KTextEditor::Document *document);
 
 private:
-    KService::Ptr getServiceForMimeTypes(QStringList mimeTypes);
     void toggleDocumentLocking(bool locked);
     void toggleAutoUpdating(bool autoRefreshing);
     void toggleRevealjs(bool revealjs);
@@ -127,6 +128,8 @@ private:
     QString m_currentMode;
     QPointer<KPartView> m_partView;
     KXMLGUIFactory *m_xmlGuiFactory;
+
+    MarkdownPart* m_part = nullptr;
 };
 
 }

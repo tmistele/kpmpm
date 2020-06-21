@@ -112,6 +112,9 @@ PreviewWidget::PreviewWidget(KTextEditorPreviewPlugin *core, KTextEditor::MainWi
     m_kPartMenuAction->setEnabled(false);
     addAction(m_kPartMenuAction);
 
+    KService::Ptr service = KService::serviceByDesktopName(QLatin1Literal("kmarkdownwebviewpart"));
+    m_part = (MarkdownPart*) service->createInstance<KParts::ReadOnlyPart>(nullptr, this, QVariantList(), nullptr);
+
     m_aboutKPartAction = new QAction(this);
     connect(m_aboutKPartAction, &QAction::triggered, this, &PreviewWidget::showAboutKPartPlugin);
     m_aboutKPartAction->setEnabled(false);
@@ -165,72 +168,30 @@ void PreviewWidget::setTextEditorView(KTextEditor::View *view)
     resetTextEditorView(m_previewedTextEditorDocument);
 }
 
-KService::Ptr PreviewWidget::getServiceForMimeTypes(QStringList mimeTypes)
-{
-    KService::Ptr service;
-
-    for (const auto &mimeType : qAsConst(mimeTypes)) {
-        service = KMimeTypeTrader::self()->preferredService(mimeType, QStringLiteral("KParts/ReadOnlyPart"));
-        if (service) {
-            qCDebug(KTEPREVIEW) << "Found preferred kpart service named" << service->name() << "with library" << service->library() << "for mimetype" << mimeType;
-
-            if (service->library().isEmpty()) {
-                qCWarning(KTEPREVIEW) << "Discarding preferred kpart service due to empty library name:" << service->name();
-                service.reset();
-            }
-
-            // no interest in kparts which also just display the text (like katepart itself)
-            // TODO: what about parts which also support importing plain text and turning into richer format
-            // and thus have it in their mimetypes list?
-            // could that perhaps be solved by introducing the concept of "native" and "imported" mimetypes?
-            // or making a distinction between source editors/viewers and final editors/viewers?
-            // latter would also help other source editors/viewers like a hexeditor, which "supports" any mimetype
-            if (service && service->mimeTypes().contains(QLatin1String("text/plain"))) {
-                qCDebug(KTEPREVIEW) << "Blindly discarding preferred service as it also supports text/plain, to avoid useless plain/text preview.";
-                service.reset();
-            }
-
-            if (service) {
-                break;
-            }
-        }
-    }
-
-    return service;
-}
-
 void PreviewWidget::resetTextEditorView(KTextEditor::Document *document)
 {
     if (!isVisible() || m_previewedTextEditorDocument != document) {
         return;
     }
 
-    KService::Ptr service;
+    bool isMarkdown = false;
 
     if (m_previewedTextEditorDocument) {
-        // TODO: mimetype is not set for new documents which have not been saved yet.
-        // Maybe retry to guess as soon as content is inserted.
         m_currentMode = m_previewedTextEditorDocument->mode();
 
-        // Get mimetypes assigned to the currently set mode.
-        auto mimeTypes = KConfigGroup(KSharedConfig::openConfig(QStringLiteral("katemoderc")), m_currentMode).readXdgListEntry("Mimetypes");
-        // Also try to guess from the content, if the above fails.
-        mimeTypes << m_previewedTextEditorDocument->mimeType();
-
-        service = getServiceForMimeTypes(mimeTypes);
-        if (!service) {
-            // TODO: Try with mimetype only from filename. Otherwise we have risk for README.md bug, see e.g. https://gitlab.freedesktop.org/xdg/shared-mime-info/-/issues/127
-            QMimeDatabase mdb;
-            auto fileNameMimes = mdb.mimeTypesForFileName(m_previewedTextEditorDocument->url().path());
-            mimeTypes.clear();
-            mimeTypes.reserve(fileNameMimes.count());
-            for (const QMimeType &mime: fileNameMimes)
-                mimeTypes.append(mime.name());
-            service = getServiceForMimeTypes(mimeTypes);
-        }
-
-        if (!service) {
-            qCDebug(KTEPREVIEW) << "Found no preferred kpart service for mimetypes" << mimeTypes;
+        // Try with mimetype only from filename. Otherwise we have risk for README.md bug, see e.g. https://gitlab.freedesktop.org/xdg/shared-mime-info/-/issues/127
+        QUrl url = m_previewedTextEditorDocument->url();
+        if(url.isEmpty()) {
+            // Treat new documents as markdown documents?
+            isMarkdown = true;
+        } else {
+            auto fileNameMimes = QMimeDatabase().mimeTypesForFileName(url.path());
+            for (const QMimeType &mime: fileNameMimes) {
+                if(mime.inherits(QLatin1Literal("text/markdown"))) {
+                    isMarkdown = true;
+                    break;
+                }
+            }
         }
 
         // Update if the mode is changed. The signal may also be emitted, when a new
@@ -243,20 +204,10 @@ void PreviewWidget::resetTextEditorView(KTextEditor::Document *document)
         m_currentMode.clear();
     }
 
-    // change of preview type?
-    // TODO: find a better id than library?
-    const QString serviceId = service ? service->library() : QString();
-
-    if (serviceId != m_currentServiceId) {
-        if (m_partView) {
-            clearMenu();
-        }
-
-        m_currentServiceId = serviceId;
-
-        if (service) {
+    if(isMarkdown) {
+        if(!m_partView) {
             qCDebug(KTEPREVIEW) << "Creating new kpart service instance.";
-            m_partView = new KPartView(service, this);
+            m_partView = new KPartView(m_part, this);
             const bool autoupdate = m_autoUpdateAction->isChecked();
             m_partView->setAutoUpdating(autoupdate);
             m_partView->setRevealjs(m_revealjsAction->isChecked());
@@ -277,11 +228,12 @@ void PreviewWidget::resetTextEditorView(KTextEditor::Document *document)
             }
 
             m_updateAction->setEnabled(!autoupdate);
-        } else {
-            m_partView = nullptr;
         }
-    } else if (m_partView) {
-        qCDebug(KTEPREVIEW) << "Reusing active kpart service instance.";
+    } else {
+        if (m_partView) {
+            clearMenu();
+        }
+        m_partView = nullptr;
     }
 
     if (m_partView) {
@@ -301,8 +253,6 @@ void PreviewWidget::unsetDocument(KTextEditor::Document *document)
     // remove any current partview
     clearMenu();
     m_partView = nullptr;
-
-    m_currentServiceId.clear();
 }
 
 void PreviewWidget::showEvent(QShowEvent *event)

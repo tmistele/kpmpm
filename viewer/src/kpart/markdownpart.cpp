@@ -161,25 +161,10 @@ bool MarkdownPart::openFile()
 
 bool MarkdownPart::doOpenStream(const QString& mimeType)
 {
-    // TODO: At the moment only for doOpenStream
-    m_sourceDocument->setRevealjs(mimeType == QLatin1Literal("text/markdown+revealjs"));
-
-    /**
-     * Skip this check for now.
-     * 1. Kate addon anyway decides to send to openFile() instead of we return false;
-     *    So we still open the file if we 'return false' -- just much slower.
-     *    Since openFile() does not check mimeType
-     * 2. Automatic mime type detection fails for .md files that start with '%' for pandoc's header part.
-     *    In this case, we would get the file from a temporary file with a different file name.
-     *    This ruins relative file paths!
-     */
-    // TODO: Correct?
-    /*
     auto mime = QMimeDatabase().mimeTypeForName(mimeType);
     if (!mime.inherits(QStringLiteral("text/markdown"))) {
         return false;
     }
-    */
 
     m_streamedData.clear();
     m_sourceDocument->setUrl(QUrl(QLatin1Literal("")));
@@ -238,6 +223,22 @@ bool MarkdownPart::closeUrl()
     m_streamedData.clear();
 
     return ReadOnlyPart::closeUrl();
+}
+
+void MarkdownPart::pmpmDirectOpen(const QString& text, const QUrl& url, bool revealjs)
+{
+    prepareViewStateRestoringOnReload();
+
+    disconnect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
+    connect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
+
+    m_sourceDocument->setUrl(url);
+    m_sourceDocument->setRevealjs(revealjs);
+    // setText must come last, since this triggers rerender
+    m_sourceDocument->setText(text);
+    m_searchAction->setEnabled(true);
+    m_searchNextAction->setEnabled(true);
+    m_searchPreviousAction->setEnabled(true);
 }
 
 void MarkdownPart::prepareViewStateRestoringOnReload()

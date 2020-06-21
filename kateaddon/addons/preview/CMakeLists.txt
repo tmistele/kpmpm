@@ -1,6 +1,6 @@
 add_library(ktexteditorpreviewplugin MODULE "")
 target_compile_definitions(ktexteditorpreviewplugin PRIVATE TRANSLATION_DOMAIN="ktexteditorpreviewplugin")
-target_link_libraries(ktexteditorpreviewplugin PRIVATE KF5::TextEditor)
+target_link_libraries(ktexteditorpreviewplugin PRIVATE KF5::TextEditor kmarkdownwebviewpart)
 
 include(ECMQtDeclareLoggingCategory)
 ecm_qt_declare_logging_category(

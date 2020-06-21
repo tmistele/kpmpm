@@ -113,7 +113,7 @@ void KMarkdownView::contextMenuEvent(QContextMenuEvent* event)
 
 bool KMarkdownView::pmpmTryInit()
 {
-    m_pmpmPipe = 0;
+    m_pmpmPipe = nullptr;
     m_pmpmInitDone = false;
 
     QString runtimeDir = QString::fromLocal8Bit(qgetenv("XDG_RUNTIME_DIR"));

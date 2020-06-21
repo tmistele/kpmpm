@@ -37,15 +37,9 @@ find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
 find_package(KF5 ${KF_MIN_VERSION} REQUIRED COMPONENTS
     I18n
     Parts
-    KIO # for thumbnails
 )
 
-find_package(Qt5WebEngineWidgets "5.7.0" CONFIG QUIET)
-set_package_properties(Qt5WebEngineWidgets PROPERTIES
-    PURPOSE "Required for markdown display"
-    URL "https://qt.io/"
-    TYPE RECOMMENDED
-)
+find_package(Qt5WebEngineWidgets "5.7.0" CONFIG REQUIRED)
 
 # Qt 5.13 deprecated QComboBox::currentIndexChanged(QString) and Qt 5.14 undid that...
 if (NOT Qt5Widgets_VERSION VERSION_LESS 5.14.0)

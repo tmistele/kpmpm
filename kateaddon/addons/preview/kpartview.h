@@ -20,6 +20,8 @@
 #ifndef KTEXTEDITORPREVIEW_KPARTVIEW_H
 #define KTEXTEDITORPREVIEW_KPARTVIEW_H
 
+#include <markdownpart.h>
+
 // KF
 #include <KService>
 
@@ -63,7 +65,7 @@ public:
      * @param service the description of the KPart which should be used, may not be a nullptr
      * @param parent the object taking ownership, can be a nullptr
      */
-    KPartView(const KService::Ptr &service, QObject *parent);
+    KPartView(MarkdownPart* part, QObject *parent);
     ~KPartView() override;
 
     /**
@@ -126,7 +128,7 @@ private:
 
 private:
     QLabel *m_errorLabel = nullptr;
-    KParts::ReadOnlyPart *m_part = nullptr;
+    MarkdownPart *m_part = nullptr;
     KTextEditor::Document *m_document = nullptr;
 
     bool m_autoUpdating = true;
