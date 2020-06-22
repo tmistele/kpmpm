@@ -68,6 +68,7 @@ Q_SIGNALS:
                               bool hasSelection, bool forcesNewWindow);
     void linkHovered(const QString& url);
     void renderingDone();
+    void scrollPositionChanged(const QPoint& scrollPosition);
 
 protected:
     void contextMenuEvent(QContextMenuEvent* event) override;

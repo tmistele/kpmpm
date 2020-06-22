@@ -115,6 +115,9 @@ PreviewWidget::PreviewWidget(KTextEditorPreviewPlugin *core, KTextEditor::MainWi
     KService::Ptr service = KService::serviceByDesktopName(QLatin1Literal("kmarkdownwebviewpart"));
     m_part = (MarkdownPart*) service->createInstance<KParts::ReadOnlyPart>(nullptr, this, QVariantList(), nullptr);
 
+    if(m_part)
+        connect(m_part, &MarkdownPart::scrollPositionChanged, this, &PreviewWidget::setScrollPosition);
+
     m_aboutKPartAction = new QAction(this);
     connect(m_aboutKPartAction, &QAction::triggered, this, &PreviewWidget::showAboutKPartPlugin);
     m_aboutKPartAction->setEnabled(false);
@@ -237,7 +240,8 @@ void PreviewWidget::resetTextEditorView(KTextEditor::Document *document)
     }
 
     if (m_partView) {
-        m_partView->setDocument(m_previewedTextEditorDocument);
+        QPoint scrollPosition = document ? document->property("pmpmScrollPosition").toPoint() : QPoint(0, 0);
+        m_partView->setDocument(m_previewedTextEditorDocument, scrollPosition);
     }
 }
 
@@ -247,7 +251,7 @@ void PreviewWidget::unsetDocument(KTextEditor::Document *document)
         return;
     }
 
-    m_partView->setDocument(nullptr);
+    m_partView->setDocument(nullptr, QPoint(0, 0));
     m_previewedTextEditorDocument = nullptr;
 
     // remove any current partview
@@ -309,6 +313,17 @@ void PreviewWidget::toggleRevealjs(bool revealjs)
 
     if(m_previewedTextEditorDocument)
         m_previewedTextEditorDocument->setProperty("pmpmRevealjs", revealjs);
+}
+
+void PreviewWidget::setScrollPosition(const QPoint& scrollPosition)
+{
+    if (!m_partView) {
+        // nothing to do
+        return;
+    }
+
+    if(m_previewedTextEditorDocument)
+        m_previewedTextEditorDocument->setProperty("pmpmScrollPosition", scrollPosition);
 }
 
 void PreviewWidget::updatePreview()

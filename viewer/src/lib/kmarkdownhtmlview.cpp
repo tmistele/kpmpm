@@ -26,6 +26,8 @@ KMarkdownHtmlView::KMarkdownHtmlView(QObject *parent)
 void KMarkdownHtmlView::setScrollPosition(int x, int y)
 {
     m_scrollPosition = QPoint(x, y);
+
+    emit scrollPositionChanged(m_scrollPosition);
 }
 
 void KMarkdownHtmlView::emitRenderingDone()

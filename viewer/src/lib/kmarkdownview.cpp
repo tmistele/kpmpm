@@ -60,6 +60,7 @@ KMarkdownView::KMarkdownView(KAbstractMarkdownSourceDocument* sourceDocument, QW
 
     connect(this, &KMarkdownView::loadFinished, this, &KMarkdownView::doLoadFinished);
     connect(m_htmlView, &KMarkdownHtmlView::initDone, this, &KMarkdownView::initDone);
+    connect(m_htmlView, &KMarkdownHtmlView::scrollPositionChanged, this, &KMarkdownView::scrollPositionChanged);
 
     m_pmpmRevealjs = m_sourceDocument->revealjs();
 

@@ -90,6 +90,8 @@ MarkdownPart::MarkdownPart(QWidget* parentWidget, QObject* parent, const KAboutD
     }
     connect(m_widget, &KMarkdownView::linkHovered,
             this, &MarkdownPart::showHoveredLink);
+    connect(m_widget, &KMarkdownView::scrollPositionChanged,
+            this, &MarkdownPart::scrollPositionChanged);
 
     setupActions(modus);
 }

@@ -31,6 +31,7 @@
 #include <KParts/ReadOnlyPart>
 #include <KPluginFactory>
 #include <KPluginLoader>
+#include <KParts/OpenUrlArguments>
 
 // Qt
 #include <QDesktopServices>
@@ -103,7 +104,7 @@ bool KPartView::isRevealjs() const
     return m_revealjs;
 }
 
-void KPartView::setDocument(KTextEditor::Document *document)
+void KPartView::setDocument(KTextEditor::Document *document, const QPoint& scrollPosition)
 {
     if (m_document == document) {
         return;
@@ -129,6 +130,13 @@ void KPartView::setDocument(KTextEditor::Document *document)
     if (m_document) {
         m_previewDirty = true;
         updatePreview();
+
+        // For previous scroll position restoration
+        KParts::OpenUrlArguments args(m_part->arguments());
+        args.setXOffset(scrollPosition.x());
+        args.setYOffset(scrollPosition.y());
+        m_part->setArguments(args);
+
         connect(m_document, &KTextEditor::Document::textChanged, this, &KPartView::triggerUpdatePreview);
     } else {
         m_part->closeUrl();

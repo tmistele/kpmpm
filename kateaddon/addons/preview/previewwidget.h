@@ -110,6 +110,8 @@ private:
     void showAboutKPartPlugin();
     void clearMenu();
 
+    void setScrollPosition(const QPoint& scrollPosition);
+
 private:
     KToggleAction *m_lockAction;
     KToggleAction *m_autoUpdateAction;

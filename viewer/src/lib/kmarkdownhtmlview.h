@@ -37,6 +37,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void requestSetScrollPosition(int x, int y);
+    void scrollPositionChanged(const QPoint& scrollPosition);
     void renderingDone();
     void initDone();
 

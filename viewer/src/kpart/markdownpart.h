@@ -67,6 +67,9 @@ public:
 
     void pmpmDirectOpen(const QString& text, const QUrl& url, bool revealjs);
 
+Q_SIGNALS:
+    void scrollPositionChanged(const QPoint& scrollPosition);
+
 protected: // KParts::ReadOnlyPart API
     bool openFile() override;
 

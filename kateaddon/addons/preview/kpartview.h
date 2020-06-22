@@ -80,7 +80,7 @@ public:
      *
      * @param document the document or, if there is none to preview, a nullptr
      */
-    void setDocument(KTextEditor::Document *document);
+    void setDocument(KTextEditor::Document *document, const QPoint& scrollPosition);
 
     /**
      * Returns the current document whose content is previewed by the KPart.
