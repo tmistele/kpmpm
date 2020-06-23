@@ -43,6 +43,7 @@
 #include <QApplication>
 #include <QMenu>
 #include <QVBoxLayout>
+#include <QWebEngineHistory>
 
 
 MarkdownPart::MarkdownPart(QWidget* parentWidget, QObject* parent, const KAboutData& aboutData, Modus modus)
@@ -132,6 +133,12 @@ void MarkdownPart::setupActions(Modus modus)
     auto closeFindBarShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), widget());
     closeFindBarShortcut->setContext(Qt::WidgetWithChildrenShortcut);
     connect(closeFindBarShortcut, &QShortcut::activated, m_searchToolBar, &SearchToolBar::hide);
+
+    m_backAction = KStandardAction::back(this, &MarkdownPart::back, actionCollection());
+    m_widget->addAction(m_backAction);
+
+    m_forwardAction = KStandardAction::forward(this, &MarkdownPart::forward, actionCollection());
+    m_widget->addAction(m_forwardAction);
 }
 
 bool MarkdownPart::openFile()
@@ -255,6 +262,10 @@ void MarkdownPart::prepareViewStateRestoringOnReload()
 
 void MarkdownPart::restoreScrollPosition()
 {
+    // After document switch + rendering done, clear history to prevent back/forward...
+    m_widget->history()->clear();
+
+    // ... and restore scroll position
     const KParts::OpenUrlArguments args(arguments());
     m_widget->setScrollPosition(args.xOffset(), args.yOffset());
 
@@ -278,6 +289,12 @@ void MarkdownPart::requestContextMenu(const QPoint& globalPos,
         if (hasSelection) {
             menu.addAction(m_copySelectionAction);
         } else {
+            QWebEngineHistory* history = m_widget->history();
+            m_backAction->setEnabled(history->canGoBack());
+            m_forwardAction->setEnabled(history->canGoForward());
+
+            menu.addAction(m_backAction);
+            menu.addAction(m_forwardAction);
             menu.addAction(m_selectAllAction);
             if (m_searchToolBar->isHidden()) {
                 menu.addAction(m_searchAction);
@@ -406,4 +423,14 @@ void MarkdownPart::saveLinkAs()
 void MarkdownPart::selectAll()
 {
     m_widget->selectAllText();
+}
+
+void MarkdownPart::back()
+{
+    m_widget->back();
+}
+
+void MarkdownPart::forward()
+{
+    m_widget->forward();
 }

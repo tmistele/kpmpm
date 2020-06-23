@@ -92,6 +92,8 @@ private:
     void copyLinkUrl();
     void saveLinkAs();
     void selectAll();
+    void back();
+    void forward();
 
 private:
     MarkdownSourceDocument* m_sourceDocument;
@@ -102,6 +104,8 @@ private:
     QAction* m_searchAction;
     QAction* m_searchNextAction;
     QAction* m_searchPreviousAction;
+    QAction* m_backAction;
+    QAction* m_forwardAction;
 
     MarkdownBrowserExtension* const m_browserExtension;
 

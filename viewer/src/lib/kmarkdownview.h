@@ -53,6 +53,8 @@ public:
     void copyLinkUrl();
     void saveLinkAs();
     void selectAllText();
+    void back();
+    void forward();
     bool isCopyTextEnabled() const;
     bool isSelectAllEnabled() const;
     QPoint scrollPosition() const;
@@ -123,6 +125,16 @@ inline void KMarkdownView::saveLinkAs()
 inline void KMarkdownView::selectAllText()
 {
     triggerPageAction(WebPage::SelectAll);
+}
+
+inline void KMarkdownView::back()
+{
+    triggerPageAction(WebPage::Back);
+}
+
+inline void KMarkdownView::forward()
+{
+    triggerPageAction(WebPage::Forward);
 }
 
 inline bool KMarkdownView::isCopyTextEnabled() const
