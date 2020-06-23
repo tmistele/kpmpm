@@ -40,6 +40,7 @@ public:
 
 Q_SIGNALS:
     void textChanged(const QString& text);
+    void urlChanged(const QUrl& url);
 };
 
 #endif

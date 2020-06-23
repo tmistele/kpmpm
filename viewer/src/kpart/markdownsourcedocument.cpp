@@ -31,7 +31,10 @@ QString MarkdownSourceDocument::text() const
 
 void MarkdownSourceDocument::setUrl(const QUrl& url)
 {
+    const bool changed = url != m_url;
     m_url = url;
+    if(changed)
+        emit urlChanged(m_url);
 }
 
 void MarkdownSourceDocument::setRevealjs(const bool revealjs)

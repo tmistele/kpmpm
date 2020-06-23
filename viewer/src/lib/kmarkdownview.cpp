@@ -157,7 +157,7 @@ void KMarkdownView::initDone()
 {
     m_pmpmInitDone = true;
     if(m_pmpmDirty)
-        return pmpmUpdateText();
+        pmpmUpdateText();
 }
 
 void KMarkdownView::textChanged(const QString& text)
