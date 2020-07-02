@@ -156,7 +156,9 @@ bool MarkdownPart::openFile()
     file.close();
 
     disconnect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
-    connect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
+    // Restore scroll position only on document change
+    if(url() != m_sourceDocument->url())
+        connect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
 
     m_sourceDocument->setUrl(url());
     m_sourceDocument->setText(text);
@@ -200,9 +202,10 @@ bool MarkdownPart::doCloseStream()
 
     QTextStream stream(&buffer);
     QString text = stream.readAll();
-
     disconnect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
-    connect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
+    // Restore scroll position only on document change
+    if(url() != m_sourceDocument->url())
+        connect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
 
     m_sourceDocument->setUrl(url());
     m_sourceDocument->setText(text);
@@ -234,14 +237,18 @@ bool MarkdownPart::closeUrl()
     return ReadOnlyPart::closeUrl();
 }
 
-void MarkdownPart::pmpmDirectOpen(const QString& text, const QUrl& url, bool revealjs)
+void MarkdownPart::pmpmDirectOpen(const QString& text, const QUrl& newurl, bool revealjs)
 {
     prepareViewStateRestoringOnReload();
 
     disconnect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
-    connect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
+    // Restore scroll position only on document change
+    if(newurl != m_sourceDocument->url())
+        connect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
 
-    m_sourceDocument->setUrl(url);
+    setUrl(newurl);
+
+    m_sourceDocument->setUrl(newurl);
     m_sourceDocument->setRevealjs(revealjs);
     // setText must come last, since this triggers rerender
     m_sourceDocument->setText(text);
