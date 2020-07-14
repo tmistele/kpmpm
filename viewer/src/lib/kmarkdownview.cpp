@@ -207,7 +207,7 @@ void KMarkdownView::pmpmUpdateText()
         data.prepend((
             QLatin1Literal("<!-- filepath:") +
             url.path() +
-            QLatin1Literal("-->\n")
+            QLatin1Literal(" -->\n")
         ).toUtf8());
     }
 
