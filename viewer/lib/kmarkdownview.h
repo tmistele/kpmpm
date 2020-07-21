@@ -59,6 +59,7 @@ public:
     bool isSelectAllEnabled() const;
     QPoint scrollPosition() const;
     void setScrollPosition(int x, int y);
+    void reloadImagesWithoutCache();
     void renderPage(QPainter* painter, const QRect& clip);
     void findText(const QString& text, WebPage::FindFlags findFlags = {});
 

@@ -81,6 +81,11 @@ void KMarkdownView::setScrollPosition(int x, int y)
     m_htmlView->requestSetScrollPosition(x, y);
 }
 
+void KMarkdownView::reloadImagesWithoutCache()
+{
+    m_htmlView->requestReloadImagesWithoutCache();
+}
+
 void KMarkdownView::renderPage(QPainter* painter, const QRect& clip)
 {
     Q_UNUSED(painter);

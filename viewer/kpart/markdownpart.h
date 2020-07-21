@@ -65,7 +65,7 @@ public:
 
     bool closeUrl() override;
 
-    void pmpmDirectOpen(const QString& text, const QUrl& url, bool revealjs);
+    void pmpmDirectOpen(const QString& text, const QUrl& url, bool revealjs, bool flushCache);
 
 Q_SIGNALS:
     void scrollPositionChanged(const QPoint& scrollPosition);
@@ -82,6 +82,7 @@ private:
     void setupActions(Modus modus);
     void prepareViewStateRestoringOnReload();
     void restoreScrollPosition();
+    void reloadImagesWithoutCache();
 
     void handleOpenUrlRequest(const QUrl& url);
     void requestContextMenu(const QPoint& globalPos,

@@ -118,6 +118,7 @@ public:
      * Update preview to current document content.
      */
     void updatePreview();
+    void updatePreviewNoCache();
 
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
@@ -125,6 +126,7 @@ protected:
 private:
     void triggerUpdatePreview();
     void handleOpenUrlRequest(const QUrl &url);
+    void doUpdatePreview(bool flushCache);
 
 private:
     QLabel *m_errorLabel = nullptr;

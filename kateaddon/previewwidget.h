@@ -107,6 +107,7 @@ private:
     void toggleAutoUpdating(bool autoRefreshing);
     void toggleRevealjs(bool revealjs);
     void updatePreview();
+    void updatePreviewNoCache();
     void showAboutKPartPlugin();
     void clearMenu();
 
@@ -117,6 +118,7 @@ private:
     KToggleAction *m_autoUpdateAction;
     KToggleAction *m_revealjsAction;
     QAction *m_updateAction;
+    QAction *m_updateNoCacheAction;
     QWidgetAction *m_kPartMenuAction;
     QMenu *m_kPartMenu;
     QAction *m_aboutKPartAction;

@@ -237,7 +237,7 @@ bool MarkdownPart::closeUrl()
     return ReadOnlyPart::closeUrl();
 }
 
-void MarkdownPart::pmpmDirectOpen(const QString& text, const QUrl& newurl, bool revealjs)
+void MarkdownPart::pmpmDirectOpen(const QString& text, const QUrl& newurl, bool revealjs, bool flushCache)
 {
     prepareViewStateRestoringOnReload();
 
@@ -245,6 +245,11 @@ void MarkdownPart::pmpmDirectOpen(const QString& text, const QUrl& newurl, bool 
     // Restore scroll position only on document change
     if(newurl != m_sourceDocument->url())
         connect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
+
+    disconnect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::reloadImagesWithoutCache);
+    // Reload images without cache after renderingDone
+    if(flushCache)
+        connect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::reloadImagesWithoutCache);
 
     setUrl(newurl);
 
@@ -277,6 +282,12 @@ void MarkdownPart::restoreScrollPosition()
     m_widget->setScrollPosition(args.xOffset(), args.yOffset());
 
     disconnect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::restoreScrollPosition);
+}
+
+void MarkdownPart::reloadImagesWithoutCache()
+{
+    m_widget->reloadImagesWithoutCache();
+    disconnect(m_widget, &KMarkdownView::renderingDone, this, &MarkdownPart::reloadImagesWithoutCache);
 }
 
 void MarkdownPart::handleOpenUrlRequest(const QUrl& url)

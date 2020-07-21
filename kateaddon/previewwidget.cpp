@@ -88,6 +88,12 @@ PreviewWidget::PreviewWidget(KTextEditorPreviewPlugin *core, KTextEditor::MainWi
     m_updateAction->setEnabled(false);
     addAction(m_updateAction);
 
+    m_updateNoCacheAction = new QAction(QIcon::fromTheme(QStringLiteral("update-none")), i18n("Update Preview without cache"), this);
+    m_updateNoCacheAction->setToolTip(i18n("Update the preview to the current document content, not using images from cache"));
+    connect(m_updateNoCacheAction, &QAction::triggered, this, &PreviewWidget::updatePreviewNoCache);
+    m_updateNoCacheAction->setChecked(false);
+    addAction(m_updateNoCacheAction);
+
     // manually prepare a proper dropdown menu button, because Qt itself does not do what one would expect
     // when adding a default menu->menuAction() to a QToolbar
     const auto kPartMenuIcon = QIcon::fromTheme(QStringLiteral("application-menu"));
@@ -330,6 +336,13 @@ void PreviewWidget::updatePreview()
 {
     if (m_partView && m_partView->document()) {
         m_partView->updatePreview();
+    }
+}
+
+void PreviewWidget::updatePreviewNoCache()
+{
+    if (m_partView && m_partView->document()) {
+        m_partView->updatePreviewNoCache();
     }
 }
 

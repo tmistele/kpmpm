@@ -188,7 +188,7 @@ void KPartView::triggerUpdatePreview()
     }
 }
 
-void KPartView::updatePreview()
+void KPartView::doUpdatePreview(bool flushCache)
 {
     m_updateSquashingTimerSlow.stop();
     m_updateSquashingTimerFast.stop();
@@ -202,9 +202,19 @@ void KPartView::updatePreview()
     // TODO: investigate if pushing of the data to the kpart could be done in a non-gui-thread,
     // so their loading of the file (e.g. ReadOnlyPart::openFile() is sync design) does not block
 
-    m_part->pmpmDirectOpen(m_document->text(), m_document->url(), m_revealjs);
+    m_part->pmpmDirectOpen(m_document->text(), m_document->url(), m_revealjs, flushCache);
 
     m_previewDirty = false;
+}
+
+void KPartView::updatePreview()
+{
+    doUpdatePreview(false);
+}
+
+void KPartView::updatePreviewNoCache()
+{
+    doUpdatePreview(true);
 }
 
 void KPartView::handleOpenUrlRequest(const QUrl &url)

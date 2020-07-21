@@ -36,6 +36,7 @@ public Q_SLOTS:
     void emitInitDone();
 
 Q_SIGNALS:
+    void requestReloadImagesWithoutCache();
     void requestSetScrollPosition(int x, int y);
     void scrollPositionChanged(const QPoint& scrollPosition);
     void renderingDone();
