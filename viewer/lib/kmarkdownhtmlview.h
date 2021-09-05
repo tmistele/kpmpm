@@ -34,6 +34,7 @@ public Q_SLOTS:
     void setScrollPosition(int x, int y);
     void emitRenderingDone();
     void emitInitDone();
+    void emitAuthFail();
 
 Q_SIGNALS:
     void requestReloadImagesWithoutCache();
@@ -41,6 +42,7 @@ Q_SIGNALS:
     void scrollPositionChanged(const QPoint& scrollPosition);
     void renderingDone();
     void initDone();
+    void authFail();
 
 private:
     QPoint m_scrollPosition;

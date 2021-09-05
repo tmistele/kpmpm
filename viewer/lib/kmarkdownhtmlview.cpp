@@ -39,3 +39,8 @@ void KMarkdownHtmlView::emitInitDone()
 {
     emit initDone();
 }
+
+void KMarkdownHtmlView::emitAuthFail()
+{
+    emit authFail();
+}

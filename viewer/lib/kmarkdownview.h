@@ -79,6 +79,7 @@ protected:
 private:
     void doLoadFinished(bool ok);
     void initDone();
+    void authFail();
     void textChanged(const QString& text);
     void pmpmUpdateText();
     bool pmpmTryInit();
@@ -96,6 +97,7 @@ private:
     QString m_pmpmClientPath;
     QString m_pmpmClientPathRevealjs;
     QString m_pmpmWebsocketPort;
+    QString m_pmpmWebsocketSecret;
     bool m_pmpmRevealjs;
     bool m_pmpmInitDone;
     bool m_pmpmDirty;

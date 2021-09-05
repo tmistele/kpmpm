@@ -60,6 +60,7 @@ KMarkdownView::KMarkdownView(KAbstractMarkdownSourceDocument* sourceDocument, QW
 
     connect(this, &KMarkdownView::loadFinished, this, &KMarkdownView::doLoadFinished);
     connect(m_htmlView, &KMarkdownHtmlView::initDone, this, &KMarkdownView::initDone);
+    connect(m_htmlView, &KMarkdownHtmlView::authFail, this, &KMarkdownView::authFail);
     connect(m_htmlView, &KMarkdownHtmlView::scrollPositionChanged, this, &KMarkdownView::scrollPositionChanged);
 
     m_pmpmRevealjs = m_sourceDocument->revealjs();
@@ -139,7 +140,14 @@ bool KMarkdownView::pmpmTryInit()
         return false;
     m_pmpmWebsocketPort = QString::fromLocal8Bit(tmp3.readAll());
 
-    setUrl(QUrl(QLatin1Literal("file://") + (m_pmpmRevealjs ? m_pmpmClientPathRevealjs : m_pmpmClientPath) + QLatin1Literal("?port=") + m_pmpmWebsocketPort));
+    QFile tmp4(runtimeDir + QLatin1Literal("/pmpm/websocket_secret"));
+    if(!tmp4.open(QIODevice::ReadOnly))
+        return false;
+    m_pmpmWebsocketSecret = QString::fromLocal8Bit(tmp4.readAll());
+
+    setUrl(QUrl(QLatin1Literal("file://") + (m_pmpmRevealjs ? m_pmpmClientPathRevealjs : m_pmpmClientPath)
+        + QLatin1Literal("?port=") + m_pmpmWebsocketPort
+        + QLatin1Literal("&secret=") + m_pmpmWebsocketSecret));
 
     m_pmpmPipe = new QFile(runtimeDir + QLatin1Literal("/pmpm/pipe"));
     // Unbuffered is needed so that content is directy flushed to pmpm on each write
@@ -165,6 +173,21 @@ void KMarkdownView::initDone()
         pmpmUpdateText();
 }
 
+void KMarkdownView::authFail()
+{
+    // After pmpm restart, authentication will fail
+    // Detect this by checking if secret changed. If so, just reload
+    QString runtimeDir = QString::fromLocal8Bit(qgetenv("XDG_RUNTIME_DIR"));
+    QFile tmp4(runtimeDir + QLatin1Literal("/pmpm/websocket_secret"));
+    if(!tmp4.open(QIODevice::ReadOnly))
+        return;
+    QString newSecret = QString::fromLocal8Bit(tmp4.readAll());
+    if(m_pmpmWebsocketSecret != newSecret) {
+        m_pmpmDirty = true; // So that text is resent to pmpm after reload
+        pmpmTryInit();
+    }
+}
+
 void KMarkdownView::textChanged(const QString& text)
 {
     if(text.isEmpty())
@@ -180,7 +203,9 @@ void KMarkdownView::textChanged(const QString& text)
     // In this case, don't update directly. This will happen automatically on initDone
     if(revealjsChanged) {
         m_pmpmInitDone = false;
-        setUrl(QUrl(QLatin1Literal("file://") + (m_pmpmRevealjs ? m_pmpmClientPathRevealjs : m_pmpmClientPath) + QLatin1Literal("?port=") + m_pmpmWebsocketPort));
+        setUrl(QUrl(QLatin1Literal("file://") + (m_pmpmRevealjs ? m_pmpmClientPathRevealjs : m_pmpmClientPath)
+            + QLatin1Literal("?port=") + m_pmpmWebsocketPort
+            + QLatin1Literal("&secret=") + m_pmpmWebsocketSecret));
         return;
     }
 

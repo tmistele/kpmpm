@@ -74,5 +74,10 @@ loadScript('qrc:///qtwebchannel/qwebchannel.js').then(() => {
         getWebsocket().then(() => {
             viewObject.emitInitDone();
         });
+
+        // Tell C++ whenever auth fails (usually after pmpm restart)
+        document.addEventListener('pmpmAuthFail', (_) => {
+            viewObject.emitAuthFail();
+        });
     });
 });
