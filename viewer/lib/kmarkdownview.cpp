@@ -176,15 +176,15 @@ void KMarkdownView::initDone()
 void KMarkdownView::authFail()
 {
     // After pmpm restart, authentication will fail
-    // Detect this by checking if secret changed. If so, just reload
+    // Detect this by checking if secret changed. If so, reconnect with new secret
     QString runtimeDir = QString::fromLocal8Bit(qgetenv("XDG_RUNTIME_DIR"));
     QFile tmp4(runtimeDir + QLatin1Literal("/pmpm/websocket_secret"));
     if(!tmp4.open(QIODevice::ReadOnly))
         return;
     QString newSecret = QString::fromLocal8Bit(tmp4.readAll());
     if(m_pmpmWebsocketSecret != newSecret) {
-        m_pmpmDirty = true; // So that text is resent to pmpm after reload
-        pmpmTryInit();
+        m_pmpmWebsocketSecret = newSecret;
+        m_htmlView->reconnectWithNewSecret(newSecret);
     }
 }
 

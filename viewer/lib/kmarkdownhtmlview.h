@@ -40,6 +40,7 @@ Q_SIGNALS:
     void requestReloadImagesWithoutCache();
     void requestSetScrollPosition(int x, int y);
     void scrollPositionChanged(const QPoint& scrollPosition);
+    void reconnectWithNewSecret(const QString& newSecret);
     void renderingDone();
     void initDone();
     void authFail();

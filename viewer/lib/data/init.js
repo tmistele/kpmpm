@@ -75,9 +75,18 @@ loadScript('qrc:///qtwebchannel/qwebchannel.js').then(() => {
             viewObject.emitInitDone();
         });
 
+        viewObject.reconnectWithNewSecret.connect((newSecret) => {
+            initWebsocketWithNewSecret(newSecret);
+        });
+
         // Tell C++ whenever auth fails (usually after pmpm restart)
         document.addEventListener('pmpmAuthFail', (_) => {
             viewObject.emitAuthFail();
         });
+
+        // When init.js loads slower than auth fails, we miss the initial
+        // pmpmAuthFail event. To catch this, explicitly check the auth status
+        if(false === getWebsocketAuthStatus())
+            viewObject.emitAuthFail();
     });
 });
