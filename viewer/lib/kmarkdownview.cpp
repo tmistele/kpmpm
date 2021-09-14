@@ -142,8 +142,10 @@ bool KMarkdownView::pmpmTryInit()
 
     QFile tmp4(runtimeDir + QLatin1Literal("/pmpm/websocket_secret"));
     if(!tmp4.open(QIODevice::ReadOnly))
-        return false;
-    m_pmpmWebsocketSecret = QString::fromLocal8Bit(tmp4.readAll());
+        // Probably we first need to socket-activate pmpm. Will re-authenticate with correct secret later
+        m_pmpmWebsocketSecret = QLatin1Literal("__doesnt_matter__");
+    else
+        m_pmpmWebsocketSecret = QString::fromLocal8Bit(tmp4.readAll());
 
     setUrl(QUrl(QLatin1Literal("file://") + (m_pmpmRevealjs ? m_pmpmClientPathRevealjs : m_pmpmClientPath)
         + QLatin1Literal("?port=") + m_pmpmWebsocketPort
