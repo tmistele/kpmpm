@@ -26,6 +26,7 @@
 #include <KService>
 
 // Qt
+#include <QHash>
 #include <QObject>
 #include <QTimer>
 
@@ -139,6 +140,7 @@ private:
     QTimer m_updateSquashingTimerFast;
     QTimer m_updateSquashingTimerSlow;
     QTemporaryFile *m_bufferFile = nullptr;
+    QHash<QKeySequence, QAction *> m_shortcuts;
 };
 
 }

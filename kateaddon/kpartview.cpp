@@ -26,6 +26,7 @@
 // KF
 #include <KTextEditor/Document>
 
+#include <KActionCollection>
 #include <KLocalizedString>
 #include <KParts/BrowserExtension>
 #include <KParts/ReadOnlyPart>
@@ -34,6 +35,8 @@
 
 // Qt
 #include <QDesktopServices>
+#include <QKeyEvent>
+#include <QKeySequence>
 #include <QLabel>
 #include <QTemporaryFile>
 
@@ -70,6 +73,23 @@ KPartView::KPartView(MarkdownPart* part, QObject *parent)
             connect(browserExtension, &KParts::BrowserExtension::openUrlRequestDelayed, this, &KPartView::handleOpenUrlRequest);
         }
         m_part->widget()->installEventFilter(this);
+
+        // Register all shortcuts of the KParts actionCollection to eat them in the
+        // event filter before they are handled by the application (and potentially
+        // identified as ambiguous).
+        // Also restrict the shortcuts to the m_part widget by setting the shortcut context.
+        m_shortcuts.clear();
+        const auto actions = m_part->actionCollection()->actions();
+        for (auto *action : actions) {
+            const auto shortcuts = action->shortcuts();
+            for (const auto &shortcut : shortcuts) {
+                m_shortcuts[shortcut] = action;
+            }
+            if (action->shortcutContext() != Qt::WidgetShortcut) {
+                action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+            }
+        }
+
     }
 }
 
@@ -228,6 +248,14 @@ bool KPartView::eventFilter(QObject *object, QEvent *event)
             updatePreview();
         }
         return true;
+    } else if (event->type() == QEvent::ShortcutOverride) {
+        const auto keyEvent = static_cast<const QKeyEvent *>(event);
+        auto *const action = m_shortcuts.value(QKeySequence(keyEvent->modifiers() | keyEvent->key()));
+        if (action) {
+            action->trigger();
+            event->accept();
+            return true;
+        }
     }
 
     return QObject::eventFilter(object, event);
