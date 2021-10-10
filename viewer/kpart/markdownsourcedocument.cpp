@@ -21,7 +21,7 @@ void MarkdownSourceDocument::setText(const QString& text)
 {
     m_text = text;
 
-    emit textChanged(m_text);
+    Q_EMIT textChanged(m_text);
 }
 
 QString MarkdownSourceDocument::text() const
@@ -34,7 +34,7 @@ void MarkdownSourceDocument::setUrl(const QUrl& url)
     const bool changed = url != m_url;
     m_url = url;
     if(changed)
-        emit urlChanged(m_url);
+        Q_EMIT urlChanged(m_url);
 }
 
 void MarkdownSourceDocument::setRevealjs(const bool revealjs)

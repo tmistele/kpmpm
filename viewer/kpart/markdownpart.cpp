@@ -24,7 +24,6 @@
 #include <kmarkdownview.h>
 
 // KF
-#include <KAboutData>
 #include <KActionCollection>
 #include <KStandardAction>
 #include <KLocalizedString>
@@ -46,7 +45,7 @@
 #include <QWebEngineHistory>
 
 
-MarkdownPart::MarkdownPart(QWidget* parentWidget, QObject* parent, const KAboutData& aboutData, Modus modus)
+MarkdownPart::MarkdownPart(QWidget* parentWidget, QObject* parent, const KPluginMetaData& metaData, Modus modus)
     : KParts::ReadOnlyPart(parent)
     , m_sourceDocument(new MarkdownSourceDocument(this))
     , m_widget(new KMarkdownView(m_sourceDocument, parentWidget))
@@ -55,7 +54,7 @@ MarkdownPart::MarkdownPart(QWidget* parentWidget, QObject* parent, const KAboutD
 {
     // set component data
     // the first arg must be the same as the subdirectory into which the part's rc file is installed
-    setComponentData(aboutData);
+    setMetaData(metaData);
 
     // set internal UI
     auto mainLayout = new QVBoxLayout;
@@ -369,8 +368,8 @@ void MarkdownPart::showHoveredLink(const QString& link)
         }
     }
 
-    emit m_browserExtension->mouseOverInfo(fileItem);
-    emit setStatusBarText(message);
+    Q_EMIT m_browserExtension->mouseOverInfo(fileItem);
+    Q_EMIT setStatusBarText(message);
 }
 
 QAction* MarkdownPart::copySelectionAction() const

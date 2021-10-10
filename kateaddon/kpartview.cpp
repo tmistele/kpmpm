@@ -30,7 +30,6 @@
 #include <KParts/BrowserExtension>
 #include <KParts/ReadOnlyPart>
 #include <KPluginFactory>
-#include <KPluginLoader>
 #include <KParts/OpenUrlArguments>
 
 // Qt

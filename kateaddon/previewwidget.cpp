@@ -28,14 +28,13 @@
 #include <KTextEditor/MainWindow>
 #include <KTextEditor/View>
 
-#include <KAboutApplicationDialog>
-#include <KAboutData>
+#include <KAboutPluginDialog>
+#include <KPluginMetaData>
 #include <KConfigGroup>
 #include <KGuiItem>
 #include <KLocalizedString>
 #include <KMimeTypeTrader>
 #include <KParts/ReadOnlyPart>
-#include <KService>
 #include <KSharedConfig>
 #include <KToggleAction>
 #include <KXMLGUIFactory>
@@ -118,11 +117,12 @@ PreviewWidget::PreviewWidget(KTextEditorPreviewPlugin *core, KTextEditor::MainWi
     m_kPartMenuAction->setEnabled(false);
     addAction(m_kPartMenuAction);
 
-    KService::Ptr service = KService::serviceByDesktopName(QLatin1Literal("kmarkdownwebviewpart"));
-    m_part = (MarkdownPart*) service->createInstance<KParts::ReadOnlyPart>(nullptr, this, QVariantList(), nullptr);
-
-    if(m_part)
-        connect(m_part, &MarkdownPart::scrollPositionChanged, this, &PreviewWidget::setScrollPosition);
+    auto metaData = KPluginMetaData::findPluginById(QLatin1Literal("kf5/parts/"), QLatin1Literal("libkmarkdownwebviewpart"));
+    if(metaData.isValid()) {
+        m_part = (MarkdownPart*) KPluginFactory::instantiatePlugin<KParts::ReadOnlyPart>(metaData, this, QVariantList()).plugin;
+        if(m_part)
+            connect(m_part, &MarkdownPart::scrollPositionChanged, this, &PreviewWidget::setScrollPosition);
+    }
 
     m_aboutKPartAction = new QAction(this);
     connect(m_aboutKPartAction, &QAction::triggered, this, &PreviewWidget::showAboutKPartPlugin);
@@ -228,8 +228,7 @@ void PreviewWidget::resetTextEditorView(KTextEditor::Document *document)
             if (kPart) {
                 m_xmlGuiFactory->addClient(kPart);
 
-                const auto kPartDisplayName = kPart->componentData().displayName();
-                m_aboutKPartAction->setText(i18n("About %1", kPartDisplayName));
+                m_aboutKPartAction->setText(i18n("About %1", kPart->metaData().name()));
                 m_aboutKPartAction->setEnabled(true);
                 m_kPartMenu->addSeparator();
                 m_kPartMenu->addAction(m_aboutKPartAction);
@@ -380,7 +379,7 @@ void PreviewWidget::removeContainer(QWidget *container, QWidget *parent, QDomEle
 void PreviewWidget::showAboutKPartPlugin()
 {
     if (m_partView && m_partView->kPart()) {
-        QPointer<KAboutApplicationDialog> aboutDialog = new KAboutApplicationDialog(m_partView->kPart()->componentData(), this);
+        QPointer<KAboutPluginDialog> aboutDialog = new KAboutPluginDialog(m_partView->kPart()->metaData(), this);
         aboutDialog->exec();
         delete aboutDialog;
     }

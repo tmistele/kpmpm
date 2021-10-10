@@ -19,8 +19,6 @@
 #define MARKDOWNPARTFACTORY_H
 
 #include <KPluginFactory>
-#include <KAboutData>
-
 
 class MarkdownPartFactory : public KPluginFactory
 {
@@ -35,9 +33,6 @@ public:
     QObject* create(const char* iface,
                     QWidget* parentWidget, QObject* parent,
                     const QVariantList& args, const QString& keyword) override;
-
-private:
-    KAboutData m_aboutData;
 };
 
 #endif

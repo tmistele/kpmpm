@@ -27,20 +27,20 @@ void KMarkdownHtmlView::setScrollPosition(int x, int y)
 {
     m_scrollPosition = QPoint(x, y);
 
-    emit scrollPositionChanged(m_scrollPosition);
+    Q_EMIT scrollPositionChanged(m_scrollPosition);
 }
 
 void KMarkdownHtmlView::emitRenderingDone()
 {
-    emit renderingDone();
+    Q_EMIT renderingDone();
 }
 
 void KMarkdownHtmlView::emitInitDone()
 {
-    emit initDone();
+    Q_EMIT initDone();
 }
 
 void KMarkdownHtmlView::emitAuthFail()
 {
-    emit authFail();
+    Q_EMIT authFail();
 }

@@ -24,7 +24,6 @@
 
 // KF
 #include <KXMLGUIBuilder>
-#include <KService>
 // Qt
 #include <QPointer>
 #include <QStackedWidget>

@@ -34,7 +34,8 @@ install(TARGETS kmarkdownwebviewpart  DESTINATION ${KDE_INSTALL_PLUGINDIR}/kf5/p
 # TODO: Better way to achieve this? Make one of the two a symlink?
 install(TARGETS kmarkdownwebviewpart ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 
-install(FILES kmarkdownwebviewpart.desktop  DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/kmarkdownwebviewpart.json  DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
+install(FILES kmarkdownwebviewpartui.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/libkmarkdownwebviewpart)
 
 install(
     FILES org.kde.kmarkdownwebviewpart.metainfo.xml

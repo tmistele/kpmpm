@@ -25,14 +25,7 @@
 
 
 MarkdownPartFactory::MarkdownPartFactory()
-    : m_aboutData(QStringLiteral("kmarkdownwebviewpart"),
-                  i18n("KMarkdownWebViewPart"),
-                  QStringLiteral(KMARKDOWNWEBVIEW_VERSION),
-                  i18n("For the rendered display of Markdown files in a webpage-like layout"),
-                  KAboutLicense::LGPL_V2_1
-                 )
 {
-    m_aboutData.addAuthor(i18n("Friedrich W. H. Kossebau"), i18n("Author"), QStringLiteral("kossebau@kde.org"));
 }
 
 MarkdownPartFactory::~MarkdownPartFactory() = default;
@@ -49,7 +42,7 @@ QObject* MarkdownPartFactory::create(const char* iface,
         wantBrowserView ? MarkdownPart::BrowserViewModus :
         /* else */        MarkdownPart::ReadOnlyModus;
 
-    MarkdownPart* part = new MarkdownPart(parentWidget, parent, m_aboutData, modus);
+    MarkdownPart* part = new MarkdownPart(parentWidget, parent, metaData(), modus);
 
     return part;
 }

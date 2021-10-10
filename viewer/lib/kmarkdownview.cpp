@@ -42,11 +42,11 @@ KMarkdownView::KMarkdownView(KAbstractMarkdownSourceDocument* sourceDocument, QW
 
     auto copyAction = pageAction(WebPage::Copy);
     connect(copyAction, &QAction::changed, this, [&] {
-        emit copyTextEnabledChanged(pageAction(WebPage::Copy)->isEnabled());
+        Q_EMIT copyTextEnabledChanged(pageAction(WebPage::Copy)->isEnabled());
     });
     auto selectAllAction = pageAction(WebPage::SelectAll);
     connect(selectAllAction, &QAction::changed, this, [&] {
-        emit selectAllEnabledChanged(pageAction(WebPage::SelectAll)->isEnabled());
+        Q_EMIT selectAllEnabledChanged(pageAction(WebPage::SelectAll)->isEnabled());
     });
 
     QWebChannel* channel = new QWebChannel(this);
@@ -111,7 +111,7 @@ void KMarkdownView::contextMenuEvent(QContextMenuEvent* event)
     } else {
     }
 
-    emit contextMenuRequested(event->globalPos(),
+    Q_EMIT contextMenuRequested(event->globalPos(),
                               result.linkUrl(), result.linkText(),
                               hasSelection, forcesNewWindow);
 

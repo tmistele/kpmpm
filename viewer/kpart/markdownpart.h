@@ -31,7 +31,7 @@ class MarkdownBrowserExtension;
 class MarkdownSourceDocument;
 class KMarkdownView;
 class SearchToolBar;
-class KAboutData;
+class KPluginMetaData;
 
 class KMARKDOWNVIEWPART_EXPORT MarkdownPart : public KParts::ReadOnlyPart
 {
@@ -46,7 +46,7 @@ public:
     /**
      * Default constructor, with arguments as expected by MarkdownPartFactory
      */
-    MarkdownPart(QWidget* parentWidget, QObject* parent, const KAboutData& aboutData, Modus modus);
+    MarkdownPart(QWidget* parentWidget, QObject* parent, const KPluginMetaData& metaData, Modus modus);
 
     /**
      * Destructor

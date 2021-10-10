@@ -48,6 +48,6 @@ bool KMarkdownViewPage::acceptNavigationRequest(const QUrl& url,
     if (url.scheme() == QLatin1Literal("file"))
         return true;
 
-    emit openUrlRequested(url);
+    Q_EMIT openUrlRequested(url);
     return false;
 }

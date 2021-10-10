@@ -1,10 +1,9 @@
-# 3.1 is required for `target_sources`.
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
 project(kpmpm VERSION 0.1)
 
-set(QT_MIN_VERSION "5.10.0")
-set(KF_MIN_VERSION "5.40.0")
+set(QT_MIN_VERSION "5.14.0")
+set(KF_MIN_VERSION "5.79.0")
 
 find_package(ECM ${KF_MIN_VERSION} REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
